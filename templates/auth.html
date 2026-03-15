@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My.Tasks — {{ 'Sign In' if mode == 'signin' else 'Sign Up' }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">My<span>.</span>Tasks</div>
+    <div class="auth-tagline">Stay on top of things</div>
+
+    <h2>{{ 'Welcome back' if mode == 'signin' else 'Create an account' }}</h2>
+
+    {% if error %}
+    <div class="auth-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="your username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="••••••••"
+               autocomplete="{{ 'current-password' if mode == 'signin' else 'new-password' }}" required />
+      </div>
+      {% if mode == 'signup' %}
+      <div class="field">
+        <label>Confirm Password</label>
+        <input type="password" name="confirm" placeholder="••••••••" autocomplete="new-password" required />
+      </div>
+      {% endif %}
+      <button type="submit" class="auth-btn">
+        {{ 'Sign In' if mode == 'signin' else 'Create Account' }}
+      </button>
+    </form>
+
+    <div class="auth-switch">
+      {% if mode == 'signin' %}
+        Don't have an account? <a href="{{ url_for('signup') }}">Sign up</a>
+      {% else %}
+        Already have an account? <a href="{{ url_for('signin') }}">Sign in</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+</body>
+</html>

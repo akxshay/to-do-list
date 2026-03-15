@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My.Tasks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="app-page">
+  <div class="app-container">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div>
+        <h1>My<span>.</span>Tasks</h1>
+        <p class="subtitle">Stay on top of things</p>
+      </div>
+      <div class="top-bar-right">
+        <div class="user-chip">Signed in as <strong>{{ username }}</strong></div>
+        <a href="{{ url_for('signout') }}" class="signout-btn">Sign out</a>
+      </div>
+    </div>
+
+    <!-- ADD TASK FORM -->
+    <form class="add-form" method="POST" action="{{ url_for('add_task') }}">
+      <input type="hidden" name="filter" value="{{ filter }}">
+      <div class="form-row">
+        <input type="text" name="text" placeholder="What needs to be done?" autocomplete="off" />
+      </div>
+      <div class="form-row">
+        <input type="date" name="due" />
+        <button type="submit" class="add-btn">+ Add</button>
+      </div>
+    </form>
+
+    <!-- FILTERS -->
+    <div class="filters">
+      <a href="{{ url_for('tasks_page', filter='all') }}"
+         class="filter-btn {{ 'active' if filter == 'all' }}">All</a>
+      <a href="{{ url_for('tasks_page', filter='active') }}"
+         class="filter-btn {{ 'active' if filter == 'active' }}">Active</a>
+      <a href="{{ url_for('tasks_page', filter='done') }}"
+         class="filter-btn {{ 'active' if filter == 'done' }}">Done</a>
+    </div>
+
+    <!-- STATS -->
+    {% if total %}
+    <div class="stats">{{ done }} of {{ total }} completed</div>
+    {% endif %}
+
+    <!-- TASK LIST -->
+    <div class="task-list">
+      {% for t in tasks %}
+      <div class="task-item {{ 'done' if t.done }} {{ 'overdue' if t.due_status == 'overdue' and not t.done }}">
+
+        <!-- Toggle done -->
+        <form method="POST" action="{{ url_for('toggle_task', task_id=t.id) }}" class="check-form">
+          <input type="hidden" name="filter" value="{{ filter }}">
+          <button type="submit" class="check-btn" title="Toggle complete">
+            <div class="check-box">
+              {% if t.done %}
+              <svg width="12" height="9" viewBox="0 0 12 9" fill="none">
+                <path d="M1 4L4.5 7.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {% endif %}
+            </div>
+          </button>
+        </form>
+
+        <!-- Text + due -->
+        <div class="task-content">
+          <div class="task-text">{{ t.text }}</div>
+          {% if t.due %}
+          <div class="task-due {{ t.due_status }}">
+            {% if t.due_status == 'today' %}Due today
+            {% elif t.due_status == 'overdue' %}Overdue · {{ t.due }}
+            {% else %}Due {{ t.due }}
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Delete -->
+        <form method="POST" action="{{ url_for('delete_task', task_id=t.id) }}" class="delete-form">
+          <input type="hidden" name="filter" value="{{ filter }}">
+          <button type="submit" class="delete-btn" title="Delete">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </form>
+
+      </div>
+      {% else %}
+      <div class="empty">
+        <span class="empty-icon">✓</span>
+        Nothing here — add a task above.
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
